@@ -9,9 +9,9 @@ public class Chunk : Spatial {
 	public float[,,] Data;
 	public int DivisionCount;
 
-	public MeshInstance ChunkMesh;
 	public StaticBody ChunkStaticBody;
 	public CollisionShape ChunkCollisionShape;
+	public MeshInstance ChunkMesh;
 
 	public Chunk(Vector3 Position, int Divisions) {
 		ChunkPosition = Position;
@@ -20,7 +20,11 @@ public class Chunk : Spatial {
 	}
 
 	public override void _EnterTree() {
-		
+		// The number would change depending on which order the children are in.
+		// In this instance, the StaticBody is the first child and the MeshInstance is the second.
+		ChunkStaticBody = (StaticBody)GetChild(0);
+		ChunkCollisionShape = (CollisionShape)ChunkStaticBody.GetChild(0);
+		ChunkMesh = (MeshInstance)GetChild(1);
 	}
 
 	public override void _Ready() {
@@ -59,11 +63,11 @@ public class Chunk : Spatial {
 
 		if (((Vector3[])MeshData[0]).LongLength <= 0) { return; }
 
-		ArrayMesh ChunkArrMesh = new ArrayMesh();
-		ChunkArrMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, MeshData);
+		ArrayMesh ChunkArrayMesh = new ArrayMesh();
+		ChunkArrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, MeshData);
 
-		ChunkCollider.Shape = ChunkArrMesh.CreateTrimeshShape();
-		ChunkMesh.Mesh = ChunkArrMesh;
+		ChunkCollider.Shape = ChunkArrayMesh.CreateTrimeshShape();
+		ChunkMesh.Mesh = ChunkArrayMesh;
 		ChunkMesh.SetSurfaceMaterial(0, ChunkMat);
 	}
 }
